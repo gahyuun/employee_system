@@ -12,6 +12,7 @@ export function routeRender() {
 }
 
 export const getUrlParam = (params) => {
+  console.log(new URL(location.href));
   return new URL(location.href).searchParams.get(params);
 };
 
