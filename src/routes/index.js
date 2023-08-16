@@ -21,7 +21,7 @@ export const routes = [
     component: Edit,
   },
   {
-    path: '.*',
+    path: '*',
     component: NotFound,
   }, // 404 페이지
 ];
