@@ -31,23 +31,19 @@ export default class Edit extends Component {
     let photoUrl = member.photoUrl;
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-
     if (
       existEmail(formData.get('email')) &&
-      validateEmail(formData.get('email'))
+      !validateEmail(formData.get('email'))
     )
       return;
-
     if (existFile(formData.get('file'), false)) {
       photoUrl = await uploadImage(formData.get('file'), member.photoUrl);
     }
-
     const data = {
       name: formData.get('name') || member.name,
       email: formData.get('email') || member.email,
       photoUrl: photoUrl,
     };
-
     setData(data, member.id);
 
     navigate();
@@ -64,6 +60,7 @@ export default class Edit extends Component {
 
   setEvent(member) {
     this.addEvent('submit', '.detail', (event) => {
+      console.log('first');
       this.handleSubmit(event, member);
     });
     this.addEvent('change', '.file-input', (event) => {
