@@ -19,6 +19,11 @@ import {
   ref,
   uploadBytes,
 } from 'firebase/storage';
+import {
+  MEMBER_COLLECTION,
+  RESPONSE_LENGTH,
+  SEARCH_KEYWORD,
+} from '../constants/api';
 
 export const memberStore = new Store({
   members: [],
@@ -28,41 +33,41 @@ export const memberStore = new Store({
 
 let response = '';
 export const getMembersData = async () => {
-  memberStore.state.search = false; // 검색 결과 멤버 렌더링이 아닌 모든 멤버 렌더링
-  const firstQuery = query(collection(db, 'list'), limit(7));
+  memberStore.state.search = false;
+  const firstQuery = query(collection(db, MEMBER_COLLECTION), limit(7));
   response = await getDocs(firstQuery);
-  memberStore.state.members = [...handleData(response)];
+  memberStore.state.members = [...convertResponseToArray(response)];
 };
 
 export const getNextMembersData = async () => {
-  memberStore.state.loading = true; //lading
+  memberStore.state.loading = true;
   const lastVisible = response.docs[response.docs.length - 1];
-  // 앞서 기억해둔 문서값으로 새로운 쿼리 요청
-  if (response.docs.length !== 0) {
-    // 가져올 데이터가 있을 때만
+  const isResponseData = response.docs.length !== 0;
+  if (isResponseData) {
     const nextQuery = query(
-      collection(db, 'list'),
+      collection(db, MEMBER_COLLECTION),
       startAfter(lastVisible),
-      limit(7)
+      limit(RESPONSE_LENGTH)
     );
     response = await getDocs(nextQuery);
     memberStore.state.members = [
       ...memberStore.state.members,
-      ...handleData(response),
+      ...convertResponseToArray(response),
     ];
     memberStore.state.loading = false;
-  } else {
-    const loading = document.querySelector('.the-loader');
-    loading.classList.add('hide');
-  } // 더 이상 가져올 데이터가 없을 때 , 마지막 데이터일 때 loading 애니메이션을 삭제
+    return;
+  }
+
+  const loading = document.querySelector('.the-loader');
+  loading.classList.add('hide');
 };
 
 export const getMemberDetail = async (id) => {
-  const docRef = doc(db, 'list', `${id}`);
+  const docRef = doc(db, MEMBER_COLLECTION, `${id}`);
   const response = await getDoc(docRef);
   if (response.data() === undefined) {
     return null;
-  } // 해당 id의 데이터가 존재하지 않을 때
+  }
   return {
     ...response.data(),
     id: response.id,
@@ -77,7 +82,7 @@ export const uploadImage = async (fileData, refId) => {
 };
 
 export const uploadData = (data) => {
-  addDoc(collection(db, 'list'), {
+  addDoc(collection(db, MEMBER_COLLECTION), {
     name: data.name,
     email: data.email,
     photoUrl: data.photoUrl,
@@ -85,32 +90,32 @@ export const uploadData = (data) => {
 };
 
 export const setData = (data, id) => {
-  setDoc(doc(db, 'list', id), data);
+  setDoc(doc(db, MEMBER_COLLECTION, id), data);
 };
 
 export const deleteData = (id, photoUrl) => {
   const desertRef = ref(storage, photoUrl);
   deleteObject(desertRef);
-  deleteDoc(doc(db, 'list', id));
-}; // deleteDoc은 promise를 반환 fulfilled 되기까지 Promise 기다림
+  deleteDoc(doc(db, MEMBER_COLLECTION, id));
+};
 
-export const searchData = async (keyword) => {
-  memberStore.state.search = true; // 검색 결과 멤버 렌더링
+export const searchData = async (keywordValue) => {
+  memberStore.state.search = true;
   const searchQuery = query(
-    collection(db, 'list'), // 포스트 컬렉션
-    where('name', '==', keyword)
+    collection(db, MEMBER_COLLECTION),
+    where(SEARCH_KEYWORD, '==', keywordValue)
   );
   const response = await getDocs(searchQuery);
-  memberStore.state.members = [...handleData(response)];
+  memberStore.state.members = [...convertResponseToArray(response)];
 
   const loading = document.querySelector('.the-loader');
   loading.classList.add('hide');
 };
 
-const handleData = (response) => {
-  let responseArray = [];
+const convertResponseToArray = (response) => {
+  const responseArray = [];
   response.forEach((doc) => {
-    let memberData = doc.data();
+    const memberData = doc.data();
     responseArray.push({
       name: memberData.name,
       photoUrl: memberData.photoUrl,
@@ -119,4 +124,4 @@ const handleData = (response) => {
     });
   });
   return responseArray;
-}; // 응답 결과들을 배열로 처리해주는 함수
+};

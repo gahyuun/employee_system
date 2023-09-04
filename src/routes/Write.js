@@ -3,10 +3,11 @@ import { Component } from '../core/component';
 import { navigate } from '../core/router';
 import { uploadData, uploadImage } from '../store/memberStore';
 import { v4 as uuidv4 } from 'uuid';
+import { existFile, validateEmail } from '../utils/validate';
 
 export default class Write extends Component {
-  render() {
-    this.el.innerHTML = `
+  template() {
+    return `
     <section class="write-title">
     직원을 등록해주세요
     </section>
@@ -20,47 +21,41 @@ export default class Write extends Component {
     </div>
     <button class="add-member" type="submit">등록</button>
     </form>
-        `;
-    this.el.prepend(new Header().el);
+        ;`;
+  }
+  async getImageUrl(fileData) {
+    return await uploadImage(fileData, uuidv4());
+  }
+  async handleSubmit(event) {
+    event.preventDefault();
 
-    const handleSubmit = async (event) => {
-      event.preventDefault();
+    const formData = new FormData(event.currentTarget);
 
-      const formData = new FormData(event.currentTarget);
-      if (formData.get('file').name === '') {
-        alert('이미지를 첨부해주세요');
-        return;
-      } //submit을 누르면  모두 입력이 되었는 지 확인
+    if (!existFile(formData.get('file'), true)) return;
+    if (!validateEmail(formData.get('email'))) return;
+    const photoUrl = await this.getImageUrl(formData.get('file'));
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      photoUrl: photoUrl,
+    };
 
-      const emailRegex = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
-      if (!emailRegex.test(formData.get('email'))) {
-        alert('이메일 형식을 지켜주세요');
-        return;
-      } // 이메일 형식을 확인
+    uploadData(data);
 
-      const fileData = formData.get('file');
-      const photoUrl = await uploadImage(fileData, uuidv4());
-      //fileData storage에 저장
+    navigate();
+  }
 
-      const data = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        photoUrl: photoUrl,
-      };
-
-      uploadData(data); // firebase data에 upload
-
-      navigate(); // 메인 페이지로 이동
-    }; // submit을 누르면  모두 입력이 되었는 지 확인
-
-    const imageFile = this.el.querySelector('.file-input');
-    const writeImage = this.el.querySelector('.write-image');
-
-    imageFile.addEventListener('change', () => {
-      writeImage.value = imageFile.value;
-    }); // 이미지 input에 이미지 파일 경로 작성
-
-    const form = this.el.querySelector('.write-container');
-    form.addEventListener('submit', handleSubmit);
+  setEvent() {
+    this.addEvent('change', '.file-input', (event) => {
+      const writeImage = this.componentRoot.querySelector('.write-image');
+      writeImage.value = event.currentTarget.value;
+    });
+    this.addEvent('submit', '.write-container', (event) => {
+      this.handleSubmit(event);
+    });
+  }
+  render() {
+    this.componentRoot.innerHTML = this.template();
+    this.componentRoot.prepend(new Header().componentRoot);
   }
 }

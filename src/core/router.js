@@ -10,7 +10,7 @@ export function routeRender() {
     return new RegExp(route.path + '/?$').test(hash);
   });
   routerView.innerHTML = '';
-  routerView.append(new currentRoute.component().el);
+  routerView.append(new currentRoute.component().componentRoot);
   window.scrollTo(0, 0);
 }
 
@@ -20,7 +20,7 @@ export const getUrlParam = () => {
   return value;
 };
 
-export const navigate = (url = '/#/') => {
-  window.history.pushState(null, null, url);
+export const navigate = (url = '/') => {
+  window.history.pushState(null, null, `/#${url}`);
   routeRender();
 };
