@@ -11,7 +11,11 @@ export const validateEmail = (email: FormDataEntryValue | null) => {
   return false;
 };
 
-export const existFile = (file, isAlert) => {
+export const existFile = (
+  file: FormDataEntryValue | null,
+  isAlert: boolean = false
+) => {
+  if (!(file instanceof File)) return false;
   if (file.name === '') {
     if (isAlert) {
       alert('이미지를 첨부해주세요!');
