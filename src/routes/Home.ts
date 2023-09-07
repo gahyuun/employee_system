@@ -56,11 +56,13 @@ export default class Home extends Component {
     this.addEvent('click', '#delete-members', this.deleteMembers);
 
     this.addEvent('keydown', '.search', (event) => {
-      const keyBoardEvent = event as KeyboardEvent;
-      const searchInput = this.componentRoot.querySelector(
-        '.search'
-      ) as HTMLInputElement;
-      if (keyBoardEvent.key === 'Enter' && searchInput?.value.trim()) {
+      const searchInput = this.componentRoot.querySelector('.search');
+      if (
+        !(searchInput instanceof HTMLInputElement) ||
+        !(event instanceof KeyboardEvent)
+      )
+        return;
+      if (event.key === 'Enter' && searchInput?.value.trim()) {
         searchData(searchInput.value);
       }
     });
