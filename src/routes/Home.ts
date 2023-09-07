@@ -41,7 +41,7 @@ export default class Home extends Component {
     await getMembersData();
     const memberList = new MemberList().componentRoot;
     const header = this.componentRoot.querySelector('.header');
-    header.after(memberList);
+    header?.after(memberList);
   }
 
   setEvent() {
@@ -56,8 +56,11 @@ export default class Home extends Component {
     this.addEvent('click', '#delete-members', this.deleteMembers);
 
     this.addEvent('keydown', '.search', (event) => {
-      const searchInput = this.componentRoot.querySelector('.search');
-      if (event.key === 'Enter' && searchInput.value.trim()) {
+      const keyBoardEvent = event as KeyboardEvent;
+      const searchInput = this.componentRoot.querySelector(
+        '.search'
+      ) as HTMLInputElement;
+      if (keyBoardEvent.key === 'Enter' && searchInput?.value.trim()) {
         searchData(searchInput.value);
       }
     });
