@@ -1,4 +1,9 @@
+interface route {
+  path: string;
+  component: typeof Component;
+}
 import { routes } from '../routes';
+import { Component } from './component';
 
 export function routeRender() {
   if (!location.hash) {
@@ -8,9 +13,11 @@ export function routeRender() {
   const [hash, queryString] = location.hash.split('?');
   const currentRoute = routes.find((route) => {
     return new RegExp(route.path + '/?$').test(hash);
-  });
-  routerView.innerHTML = '';
-  routerView.append(new currentRoute.component().componentRoot);
+  }) as route;
+  if (routerView) {
+    routerView.innerHTML = '';
+    routerView.append(new currentRoute.component().componentRoot);
+  }
   window.scrollTo(0, 0);
 }
 
@@ -21,6 +28,6 @@ export const getUrlParam = () => {
 };
 
 export const navigate = (url = '/') => {
-  window.history.pushState(null, null, `/#${url}`);
+  window.history.pushState(null, '', `/#${url}`);
   routeRender();
 };
