@@ -1,5 +1,18 @@
+interface componentPayload {
+  tagName?: string;
+  props?: { [key: string]: unknown };
+  state?: { [key: string]: unknown };
+  attributes?: { [key: string]: unknown };
+}
+
+interface eventCallBack {
+  (event: Event): void;
+}
 export class Component {
-  constructor(payload = {}) {
+  componentRoot: HTMLElement;
+  props: { [key: string]: unknown };
+  state: { [key: string]: unknown };
+  constructor(payload: componentPayload = {}) {
     const {
       tagName = 'div',
       props = {},
@@ -14,6 +27,7 @@ export class Component {
     this.setEvent();
   }
   render() {
+    //tagName 기본 값이 div이기에 무조건 element를 생성함 null이없음
     this.componentRoot.innerHTML = this.template();
     this.mounted();
   }
@@ -28,11 +42,13 @@ export class Component {
     }
   }
 
-  template() {}
+  template(): string {
+    return ``;
+  }
 
   setEvent() {}
 
-  addEvent(eventType, selector, callback) {
+  addEvent(eventType: string, selector: string, callback: eventCallBack) {
     const element = this.componentRoot.querySelector(selector);
     element?.addEventListener(eventType, (event) => {
       callback(event);
