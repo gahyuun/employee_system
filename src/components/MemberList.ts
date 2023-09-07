@@ -28,7 +28,8 @@ export default class MemberList extends Component {
         }
       });
     });
-    observer.observe(this.componentRoot.lastChild);
+    if (this.componentRoot.lastChild instanceof HTMLElement)
+      observer.observe(this.componentRoot.lastChild);
   }
 
   mounted() {
