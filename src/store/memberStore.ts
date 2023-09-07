@@ -24,8 +24,22 @@ import {
   RESPONSE_LENGTH,
   SEARCH_KEYWORD,
 } from '../constants/api';
-
-export const memberStore = new Store({
+export interface memberState {
+  name: string;
+  id: string;
+  photoUrl: string;
+  email: string;
+}
+export interface deleteMemberState {
+  id: string;
+  photoUrl: string;
+}
+interface memberStoreState {
+  members: memberState[];
+  deleteMembers: deleteMemberState[];
+  search: boolean;
+}
+export const memberStore = new Store<memberStoreState>({
   members: [],
   deleteMembers: [],
   search: false,
