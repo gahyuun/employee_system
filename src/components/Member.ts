@@ -1,8 +1,13 @@
 import { Component } from '../core/component';
-import { memberStore } from '../store/memberStore';
+import { memberState, memberStore } from '../store/memberStore';
 
+interface Props {
+  [key: string]: unknown;
+  member: memberState;
+}
 export default class Member extends Component {
-  constructor(props) {
+  public props!: Props;
+  constructor(props: Props) {
     super({ props, tagName: 'a', attributes: { class: 'member' } });
   }
   template() {
@@ -21,7 +26,8 @@ export default class Member extends Component {
   setEvent() {
     const { member } = this.props;
     this.addEvent('change', '.checkbox', (event) => {
-      if (event.currentTarget.checked) {
+      const target = event.currentTarget as HTMLInputElement;
+      if (target.checked) {
         memberStore.state.deleteMembers.push({
           id: member.id,
           photoUrl: member.photoUrl,
