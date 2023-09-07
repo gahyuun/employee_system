@@ -2,16 +2,19 @@ interface componentPayload {
   tagName?: string;
   props?: { [key: string]: unknown };
   state?: { [key: string]: unknown };
-  attributes?: { [key: string]: unknown };
+  attributes?: { [key: string]: string };
 }
 
 interface eventCallBack {
   (event: Event): void;
 }
+interface attributes {
+  [key: string]: string;
+}
 export class Component {
-  componentRoot: HTMLElement;
-  props: { [key: string]: unknown };
-  state: { [key: string]: unknown };
+  public componentRoot;
+  public props;
+  public state;
   constructor(payload: componentPayload = {}) {
     const {
       tagName = 'div',
@@ -32,7 +35,7 @@ export class Component {
     this.mounted();
   }
 
-  setAttributes(attributes) {
+  setAttributes(attributes: attributes) {
     for (const key of Object.keys(attributes)) {
       if (key === 'class') {
         this.componentRoot.classList.add(attributes[key]);
