@@ -39,7 +39,6 @@ export default class Edit extends Component {
     if (event.currentTarget instanceof HTMLFormElement) {
       const formData = new FormData(event.currentTarget);
       const email = formData.get('email');
-      console.log(email);
       const file = formData.get('file');
       if (typeof email !== 'string' || !validateEmail(email)) return;
       if (existFile(file, false)) {

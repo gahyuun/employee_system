@@ -2,7 +2,7 @@ import { DocumentData } from 'firebase/firestore';
 import Header from '../components/Header';
 import { Component } from '../core/component';
 import { getUrlParam, navigate } from '../core/router';
-import { getMemberDetail, memberState } from '../store/memberStore';
+import { getMemberDetail } from '../store/memberStore';
 
 export default class Detail extends Component {
   templateSkeleton() {
@@ -21,7 +21,7 @@ export default class Detail extends Component {
       </section>
       </main>`;
   }
-  template(member:DocumentData) {
+  template(member: DocumentData) {
     return `
     <main class="detail">
       <div class='photo-detail' style="background-image: url(${member.photoUrl})"></div>
@@ -42,7 +42,7 @@ export default class Detail extends Component {
     </main>
   `;
   }
-  setEvent(member:DocumentData) {
+  setEvent(member: DocumentData) {
     this.addEvent('click', 'button', () => navigate(`/edit?id=${member.id}`));
   }
 

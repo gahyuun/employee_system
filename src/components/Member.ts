@@ -26,13 +26,14 @@ export default class Member extends Component {
   setEvent() {
     const { member } = this.props;
     this.addEvent('change', '.checkbox', (event) => {
-      const target = event.currentTarget as HTMLInputElement;
-      if (target.checked) {
-        memberStore.state.deleteMembers.push({
-          id: member.id,
-          photoUrl: member.photoUrl,
-        });
-      }
+      const target = event.currentTarget;
+      if (target instanceof HTMLInputElement && member.id)
+        if (target.checked) {
+          memberStore.state.deleteMembers.push({
+            id: member.id,
+            photoUrl: member.photoUrl,
+          });
+        }
     });
   }
 }

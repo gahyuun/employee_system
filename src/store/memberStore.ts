@@ -34,6 +34,7 @@ export interface memberState {
   photoUrl: string;
   email: string;
 }
+
 export interface deleteMemberState {
   id: string;
   photoUrl: string;
@@ -89,7 +90,7 @@ export const getMemberDetail = async (id: string) => {
     return null;
   }
 
-  return response.data();
+  return { ...response.data(), id };
 };
 
 export const uploadImage = async (fileData: File, refId: string) => {
