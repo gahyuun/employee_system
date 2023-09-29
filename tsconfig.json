@@ -5,7 +5,8 @@
     "moduleResolution": "Node", //index라는 이름 자동으로 찾도록
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
-    "strict": true
+    "strict": true,
+    "allowJs": true
   },
   "include": ["src/*.ts"],
   "exclude": ["node_modules", "dist"]

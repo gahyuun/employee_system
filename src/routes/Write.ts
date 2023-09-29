@@ -31,15 +31,20 @@ export default class Write extends Component {
     if (!(event.currentTarget instanceof HTMLFormElement)) return;
     const formData = new FormData(event.currentTarget);
 
-    if (!existFile(formData.get('file'), true)) return;
-    if (!validateEmail(formData.get('email'))) return;
-    const photoUrl = await this.getImageUrl(formData.get('file') as File); //existFile로 file 존재 유무 확인
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const file = formData.get('file');
+    if (typeof name !== 'string' || typeof email !== 'string') return;
+
+    if (!existFile(file, true)) return;
+    if (!validateEmail(email)) return;
+    const photoUrl = await this.getImageUrl(file as File); //existFile로 file 존재 유무 확인
+
     const data = {
-      name: formData.get('name'),
-      email: formData.get('email'),
+      name: name,
+      email: email,
       photoUrl: photoUrl,
     };
-
     uploadData(data);
 
     navigate();

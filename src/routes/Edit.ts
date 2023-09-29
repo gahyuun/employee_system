@@ -1,3 +1,4 @@
+import { DocumentData } from 'firebase/firestore';
 import Header from '../components/Header';
 import { Component } from '../core/component';
 import { getUrlParam, navigate } from '../core/router';
@@ -7,10 +8,10 @@ import {
   setData,
   uploadImage,
 } from '../store/memberStore';
-import { existEmail, existFile, validateEmail } from '../utils/validate';
+import { existFile, validateEmail } from '../utils/validate';
 
 export default class Edit extends Component {
-  template(member) {
+  template(member: DocumentData) {
     return `
     <form class="detail">
       <label for="file" class="photo-edit" style="background-image: url(https://api.iconify.design/mdi-light/image.svg?color=%23a0aec0)"></label> 
@@ -32,40 +33,48 @@ export default class Edit extends Component {
     </form> 
       `;
   }
-  async handleSubmit(event, member) {
+  async handleSubmit(event: Event, member: DocumentData) {
     let photoUrl = member.photoUrl;
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    if (
-      existEmail(formData.get('email')) &&
-      !validateEmail(formData.get('email'))
-    )
-      return;
-    if (existFile(formData.get('file'), false)) {
-      photoUrl = await uploadImage(formData.get('file'), member.photoUrl);
+    if (event.currentTarget instanceof HTMLFormElement) {
+      const formData = new FormData(event.currentTarget);
+      const email = formData.get('email');
+      console.log(email);
+      const file = formData.get('file');
+      if (typeof email !== 'string' || !validateEmail(email)) return;
+      if (existFile(file, false)) {
+        photoUrl = await uploadImage(file as File, member.photoUrl);
+      }
+      const data = {
+        name: formData.get('name') || member.name,
+        email: formData.get('email') || member.email,
+        photoUrl: photoUrl,
+      };
+      setData(data, member.id);
+
+      navigate();
     }
-    const data = {
-      name: formData.get('name') || member.name,
-      email: formData.get('email') || member.email,
-      photoUrl: photoUrl,
-    };
-    setData(data, member.id);
-
-    navigate();
   }
 
-  async previewImage(event) {
-    const photoEdit = this.componentRoot.querySelector('.photo-edit');
-    let reader = new FileReader();
-    reader.onload = (event) => {
-      photoEdit.style.backgroundImage = `url(${event.currentTarget.result})`;
-    };
-    reader.readAsDataURL(event.currentTarget.files[0]);
+  async previewImage(event: Event) {
+    if (event.currentTarget instanceof HTMLInputElement) {
+      const photoEdit = this.componentRoot.querySelector('.photo-edit');
+      const target = event.currentTarget;
+      const file = target?.files;
+      let reader = new FileReader();
+      reader.onload = (event) => {
+        if (
+          event.currentTarget instanceof FileReader &&
+          photoEdit instanceof HTMLElement
+        )
+          photoEdit.style.backgroundImage = `url(${event.currentTarget?.result})`;
+      };
+      if (file) reader.readAsDataURL(file[0]);
+    }
   }
 
-  setEvent(member: memberState) {
+  setEvent(member: DocumentData) {
     this.addEvent('submit', '.detail', (event) => {
-      console.log('first');
       this.handleSubmit(event, member);
     });
     this.addEvent('change', '.file-input', (event) => {

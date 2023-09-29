@@ -17,7 +17,7 @@ export default class Home extends Component {
     }
     await Promise.all(
       memberStore.state.deleteMembers.map(({ id, photoUrl }) => {
-        deleteData(id, photoUrl);
+        deleteData({ id, photoUrl });
       })
     );
     memberStore.state.deleteMembers = [];

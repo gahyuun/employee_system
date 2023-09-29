@@ -30,7 +30,7 @@ import {
 } from '../constants/api';
 export interface memberState {
   name: string;
-  id: string;
+  id?: string;
   photoUrl: string;
   email: string;
 }
@@ -92,14 +92,14 @@ export const getMemberDetail = async (id: string) => {
   return response.data();
 };
 
-export const uploadImage = async (fileData, refId) => {
+export const uploadImage = async (fileData: File, refId: string) => {
   const storageRef = ref(storage, refId);
   await uploadBytes(storageRef, fileData);
   const photoUrl = await getDownloadURL(storageRef);
   return photoUrl;
 };
 
-export const uploadData = (data) => {
+export const uploadData = (data: memberState) => {
   addDoc(collection(db, MEMBER_COLLECTION), {
     name: data.name,
     email: data.email,
@@ -107,17 +107,17 @@ export const uploadData = (data) => {
   });
 };
 
-export const setData = (data, id) => {
+export const setData = (data: memberState, id: string) => {
   setDoc(doc(db, MEMBER_COLLECTION, id), data);
 };
 
-export const deleteData = (id, photoUrl) => {
+export const deleteData = ({ id, photoUrl }: deleteMemberState) => {
   const desertRef = ref(storage, photoUrl);
   deleteObject(desertRef);
   deleteDoc(doc(db, MEMBER_COLLECTION, id));
 };
 
-export const searchData = async (keywordValue) => {
+export const searchData = async (keywordValue: string) => {
   memberStore.state.search = true;
   const searchQuery = query(
     collection(db, MEMBER_COLLECTION),
@@ -127,7 +127,7 @@ export const searchData = async (keywordValue) => {
   memberStore.state.members = [...convertResponseToArray(response)];
 
   const loading = document.querySelector('.the-loader');
-  loading.classList.add('hide');
+  loading?.classList.add('hide');
 };
 
 const convertResponseToArray = (

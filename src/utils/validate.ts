@@ -1,14 +1,11 @@
 import { EMAIL_REGEX } from '../constants/regex';
 
-export const validateEmail = (email: FormDataEntryValue | null) => {
-  if (email instanceof String && !email) {
-    if (!EMAIL_REGEX.test(email)) {
-      alert('이메일 형식을 지켜주세요!');
-      return false;
-    }
-    return true;
+export const validateEmail = (email: string | null) => {
+  if (email && !EMAIL_REGEX.test(email)) {
+    alert('이메일 형식을 지켜주세요!');
+    return false;
   }
-  return false;
+  return true;
 };
 
 export const existFile = (
@@ -23,9 +20,4 @@ export const existFile = (
     return false;
   }
   return true;
-};
-
-export const existEmail = (email) => {
-  if (email) return true;
-  return false;
 };
