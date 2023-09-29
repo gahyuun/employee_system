@@ -1,3 +1,6 @@
+import { DocumentData } from 'firebase/firestore';
+import { memberState } from '../store/memberStore';
+
 interface componentPayload {
   tagName?: string;
   props?: { [key: string]: unknown };
@@ -45,11 +48,11 @@ export class Component {
     }
   }
 
-  template(): string {
+  template(member?: DocumentData): string {
     return ``;
   }
 
-  setEvent() {}
+  setEvent(member?: DocumentData) {}
 
   addEvent(eventType: string, selector: string, callback: eventCallBack) {
     const element = this.componentRoot.querySelector(selector);

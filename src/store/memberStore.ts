@@ -11,6 +11,10 @@ import {
   limit,
   query,
   where,
+  DocumentData,
+  QuerySnapshot,
+  DocumentReference,
+  Firestore,
 } from 'firebase/firestore';
 import { db, storage } from '../api/firebase';
 import {
@@ -38,14 +42,16 @@ interface memberStoreState {
   members: memberState[];
   deleteMembers: deleteMemberState[];
   search: boolean;
+  loading: boolean;
 }
 export const memberStore = new Store<memberStoreState>({
   members: [],
   deleteMembers: [],
   search: false,
+  loading: false,
 });
 
-let response = '';
+let response: QuerySnapshot<DocumentData, DocumentData>;
 export const getMembersData = async () => {
   memberStore.state.search = false;
   const firstQuery = query(collection(db, MEMBER_COLLECTION), limit(7));
@@ -73,19 +79,17 @@ export const getNextMembersData = async () => {
   }
 
   const loading = document.querySelector('.the-loader');
-  loading.classList.add('hide');
+  loading?.classList.add('hide');
 };
 
-export const getMemberDetail = async (id) => {
+export const getMemberDetail = async (id: string) => {
   const docRef = doc(db, MEMBER_COLLECTION, `${id}`);
   const response = await getDoc(docRef);
   if (response.data() === undefined) {
     return null;
   }
-  return {
-    ...response.data(),
-    id: response.id,
-  };
+
+  return response.data();
 };
 
 export const uploadImage = async (fileData, refId) => {
@@ -126,8 +130,10 @@ export const searchData = async (keywordValue) => {
   loading.classList.add('hide');
 };
 
-const convertResponseToArray = (response) => {
-  const responseArray = [];
+const convertResponseToArray = (
+  response: QuerySnapshot<DocumentData, DocumentData>
+) => {
+  const responseArray: memberState[] = [];
   response.forEach((doc) => {
     const memberData = doc.data();
     responseArray.push({

@@ -1,7 +1,12 @@
 import Header from '../components/Header';
 import { Component } from '../core/component';
 import { getUrlParam, navigate } from '../core/router';
-import { getMemberDetail, setData, uploadImage } from '../store/memberStore';
+import {
+  getMemberDetail,
+  memberState,
+  setData,
+  uploadImage,
+} from '../store/memberStore';
 import { existEmail, existFile, validateEmail } from '../utils/validate';
 
 export default class Edit extends Component {
@@ -58,7 +63,7 @@ export default class Edit extends Component {
     reader.readAsDataURL(event.currentTarget.files[0]);
   }
 
-  setEvent(member) {
+  setEvent(member: memberState) {
     this.addEvent('submit', '.detail', (event) => {
       console.log('first');
       this.handleSubmit(event, member);
